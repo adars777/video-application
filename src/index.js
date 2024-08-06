@@ -1,6 +1,8 @@
 // require('dotenv').config({path:'../env'})
 import dotenv from "dotenv";
 import conncetDB from "./db/index.js";
+import { app } from "./app.js";
+
 dotenv.config({
   path: "..//env",
 });
