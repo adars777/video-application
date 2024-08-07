@@ -6,7 +6,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
@@ -175,8 +174,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
+      $unset: {
+        refreshToken: 1, //this remove the field from document
       },
     },
     {
@@ -207,7 +206,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   try {
     const decodedToken = jwt.verify(
       incomingRefreshToken,
-      process.env.ACCESS_TOKEN_SECRET
+      process.env.REFRESH_TOKEN_SECRET
     );
 
     const user = await User.findById(decodedToken?._id);
@@ -221,8 +220,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     const options = {
-      HttpOnly: true,
-      Secure: true,
+      httpOnly: true,
+      secure: true,
     };
 
     const { accessToken, newRefreshToken } =
@@ -342,7 +341,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
-  if (!username?.tri()) {
+  if (!username?.trim()) {
     throw new ApiError(400, "username is missing");
   }
 
